@@ -1,0 +1,89 @@
+public class CountInversions
+{
+	private static int amount = 0;
+	
+	private static void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi)
+	{
+		 for (int k = 0; k <= mid - lo; k++)
+			 aux[k] = a[k + lo];
+		 int i = 0, j = mid+1;
+		 for (int k = lo; k <= hi; k++)
+		 {
+			 if (i > mid - lo) a[k] = a[j++];
+			 else if (j > hi) a[k] = aux[i++];
+			 else if (less(a[j], aux[i])) 
+			 {
+				 amount += j - k;
+				 a[k] = a[j++];
+			 }
+			 else a[k] = aux[i++];
+			 
+			 
+/*			 if (i > mid) a[k] = aux[j++];
+			 else if (j > hi) a[k] = aux[i++];
+			 else if (less(aux[j], aux[i])) a[k] = aux[j++];
+			 else a[k] = aux[i++];*/
+		 }
+	}
+
+    private static void sort(Comparable[] a, Comparable[] aux, int lo, int hi)
+	{
+	    if (hi <= lo) return;
+	    int mid = lo + (hi - lo) / 2;
+	    sort(a, aux, lo, mid);
+	    sort(a, aux, mid+1, hi);
+	    merge(a, aux, lo, mid, hi);
+	}
+    
+    private static boolean less(Comparable v, Comparable w)
+    { 
+    	return v.compareTo(w) < 0; 
+    }
+    
+    private static boolean equal(Comparable v, Comparable w)
+    {
+    	return v.compareTo(w) == 0;
+    }
+
+	public static void sort(Comparable[] a)
+	{
+	    Comparable[] aux = new Comparable[a.length / 2 + 1];
+	    sort(a, aux, 0, a.length - 1);
+	}
+	
+	public static int find(Comparable[] a, Comparable x, int low, int high, int middle)
+	{
+		middle = (low + high) / 2;
+		if (less(x, a[middle])) return find(a, x, low, middle - 1, middle);
+		else if (less(a[middle], x)) return find(a, x, middle + 1, high, middle);
+		else return middle;
+	}
+	
+	public int Count(Comparable[] a)
+	{
+//		int amount = 0, N = a.length, add = 0;
+		int N = a.length, low = 0, middle = 0, high = N - 1;
+		sort(a);
+		
+//		for (int i = 0; i < N; i++)
+//			amount += Math.abs(find(b, a[i], low, high, middle) - i);
+//			if ((add = find(b, a[i], low, high, middle) - i) > 0)
+			
+		
+		return amount;
+	}
+	
+	public static void main(String[] args)
+	{
+		CountInversions task2 = new CountInversions();
+		Comparable[] a = new Comparable[5];
+		a[0] = 6;
+		a[1] = 4;
+		a[2] = 2;
+		a[3] = 5;
+		a[4] = 10; //2 4 5 6 10
+		           //6 4 2 5 10
+		
+		System.out.println("There are " + task2.Count(a) + " inversions in the array.");
+	}
+}

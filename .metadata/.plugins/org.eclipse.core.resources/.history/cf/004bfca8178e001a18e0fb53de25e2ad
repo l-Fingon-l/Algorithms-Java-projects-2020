@@ -1,0 +1,128 @@
+import edu.princeton.cs.algs4.StdRandom;
+
+public class ShufflingALinkedList
+{
+	private List b;
+	
+	public static class List
+	{
+		public Node first;
+		public Node current;
+		public int N;
+		
+		public class Node
+		{
+			public Node next;
+			public String item;
+		}
+		
+		public List()
+		{
+			first = null;
+			N = 0;
+		}
+		
+		public void push(String s)
+		{
+			Node old = first;
+			first = new Node();
+			first.item = s;
+			first.next = old;
+			N++;
+		}
+	}
+	
+	private List merge(List a, List b, int a_size, int b_size)
+	{
+		int N = a_size + b_size;
+		boolean empty = true;
+		
+		List merged = new List();
+		for (int i = 0; i < N; i++)
+		{
+			if (empty)
+			{
+				if (StdRandom.uniform(2) == 0) 
+				{
+					merged.first = a.first;
+					a.first = a.first.next;
+				}
+				else 
+				{
+					merged.first = b.current;
+					b.current = b.current.next;
+				}
+				empty = false;
+				merged.current = merged.first;
+			}
+			else
+			{
+				if (StdRandom.uniform(2) == 0) 
+				{
+					merged.current.next = a.first;
+					merged.current = merged.current.next;
+					a.first = a.first.next;
+				}
+				else
+				{
+					merged.current.next = b.current;
+					merged.current = merged.current.next;
+					b.current = b.current.next;
+				}
+			}
+		}
+		
+		a = null;
+		b = null;
+		
+		return merged;
+	}
+	
+	private List shuffle(List a, int lo, int hi)
+	{
+	    if (hi <= lo) return a;
+	    int mid = lo + (hi - lo) / 2;
+	    a = shuffle(a, lo, mid);
+	    a = shuffle(a, mid+1, hi);
+	    
+	    b = a;
+	    b.current = b.first;
+	    for (int i = 0; i < mid + 1; i++)
+	    	b.current = b.current.next;
+	    //
+	    return merge(a, b, mid + 1 - lo, hi - mid);
+	}
+	
+	public void shuffle(List a)
+	{
+		shuffle(a, 0, a.N - 1);
+	}
+	
+	
+	public static void main(String[] args)
+	{
+		List a = new List();
+		a.push("A");
+		a.push("B");
+		a.push("c");
+/*		a.push("D");
+		a.push("e");
+		a.push("F");
+		a.push("G");
+		a.push("h");
+		a.push("i");
+		a.push("J");
+		a.push("k");
+		a.push("L");
+		a.push("m");*/
+		
+		ShufflingALinkedList task3 = new ShufflingALinkedList();
+		task3.shuffle(a);
+		a.current = a.first;
+		for (int i = 0; i < 3; i++)
+		{
+			System.out.println(a.current.item);
+			a.current = a.current.next;
+		}
+	}
+}

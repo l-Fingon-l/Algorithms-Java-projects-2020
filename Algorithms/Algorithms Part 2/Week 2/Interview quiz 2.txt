@@ -1,0 +1,184 @@
+Imagine having an already constructed MST. Deleting the largest edge form it will create a cut 
+since a graph will be now divided into 2 separate connected components. To get a spanning tree, 
+we would have to connect these parts anyway. And the shortest edge for it is the exact edge we 
+have just removed from the graph. 
+Thus, the bottleneck minimum spanning tree is an MST itself and we can use any efficient algorithm 
+to tackle the problem. Prim's or Kruskal's algorithms would be suitable enough.
+======================================================================================================
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.PrimMST;
+
+public class EdgeInMST // 2*E checks at max
+{
+	private EdgeWeightedGraph G;
+	private boolean[] marked;
+	
+	public EdgeInMST(EdgeWeightedGraph G)
+	{
+		this.G = G;
+		marked = new boolean[G.V()];
+	}
+	
+	public boolean isInMST(Edge e)
+	{
+		int v = e.either();
+		int w = e.other(v);
+		for (int i = 0; i < G.V(); i++)
+			marked[i] = false;
+		marked[v] = marked[w] = true;
+		Queue<Integer> q = new Queue<>(); 
+		q.enqueue(v);
+		
+		while(!q.isEmpty())
+		{
+			int a = q.dequeue();
+			for (Edge b: G.adj(a))
+				if (b.compareTo(e) < 0)
+					if (!marked[b.other(a)])
+					{
+						q.enqueue(b.other(a));
+						marked[b.other(a)] = true;
+					}
+					else if (b != e && b.other(a) == w) return false;
+		}
+		
+		return true;
+	}
+	
+	public static void main(String[] args)
+	{
+		In in = new In(args[0]);
+		EdgeWeightedGraph G = new EdgeWeightedGraph(in);
+		
+		EdgeInMST eim = new EdgeInMST(G);
+		PrimMST mst = new PrimMST(G);
+		for (Edge x: mst.edges())
+			System.out.println(x.either() + "-" + x.other(x.either()) + (eim.isInMST(x) ? " YES" : " NO"));
+		
+		System.out.println();
+		
+		for (Edge x: G.adj(4))
+			System.out.println(x.either() + "-" + x.other(x.either()) + (eim.isInMST(x) ? " YES" : " NO"));
+	}
+}
+
+The tinyEWG.txt file taken from the 
+https://algs4.cs.princeton.edu/43mst/tinyEWG.txt
+
+And an example of input data:
+tinyEWG.txt
+
+The result: 
+1-7 YES
+0-2 YES
+2-3 YES
+4-5 YES
+5-7 YES
+6-2 YES
+0-7 YES
+
+6-4 NO
+0-4 NO
+4-7 NO
+4-5 YES
+============================================================================================================
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.SET;
+
+public class MinimumFeedbackSet 
+{
+	private EdgeWeightedGraph G;
+	private boolean[] marked;
+	private boolean[] cycle;
+	private Stack<Edge> edgeTo;
+	private SET<Edge> Set;
+	
+	public MinimumFeedbackSet(EdgeWeightedGraph G_)
+	{
+		G = G_;
+		Set = new SET<Edge>();
+		marked = new boolean[G.V()];
+		cycle = new boolean[G.V()];
+		edgeTo = new Stack<Edge>();
+		for (int i = 0; i < G.V(); i++)
+			if (!marked[i])
+				DFS(i);		
+	}
+	
+	private void DFS(int v)
+	{
+		marked[v] = cycle[v] = true;
+		
+		for (Edge e: G.adj(v))
+			if (!marked[e.other(v)])
+			{
+				edgeTo.push(e);
+				DFS(e.other(v));
+				edgeTo.pop();
+			}
+			else if (cycle[e.other(v)] && edgeTo.peek() != e) 
+			{
+				edgeTo.push(e);
+				addFeedbackEdge(v, e.other(v));
+				edgeTo.pop();
+			}
+		cycle[v] = false;
+	}
+	
+	private void addFeedbackEdge(int v, int w)
+	{
+		Edge min = edgeTo.peek();
+		for (Edge e: edgeTo)
+			if (v != w)
+			{
+				if (e.compareTo(min) < 0 && !Set.contains(e))
+				{
+					min = e;
+					v = min.other(v);
+				}
+			}
+			else break;
+				
+		Set.add(min);
+	}
+	
+	public Iterable<Edge> edges()
+	{
+		 SET<Edge> result = new SET<>();
+		 for (Edge e: Set)
+			 result.add(e);
+		 return result;
+	}
+	
+	public static void main(String[] args)
+	{
+		In in = new In(args[0]);
+		EdgeWeightedGraph G = new EdgeWeightedGraph(in);
+		MinimumFeedbackSet mfs = new MinimumFeedbackSet(G);
+		for (Edge e: mfs.edges())
+			System.out.println(e);
+	}
+}
+
+The tinyEWG.txt file taken from the 
+https://algs4.cs.princeton.edu/43mst/tinyEWG.txt
+
+And an example of input data:
+tinyEWG.txt
+
+The result: 
+0-7 0.16000
+2-3 0.17000
+1-7 0.19000
+0-2 0.26000
+5-7 0.28000
+1-3 0.29000
+1-5 0.32000
+2-7 0.34000
+0-4 0.38000

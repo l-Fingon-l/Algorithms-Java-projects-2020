@@ -1,0 +1,333 @@
+public class IntersectionOfTwoSets 
+{
+	private point2D[] a;
+	private point2D[] b;
+	private int N;
+	
+	public IntersectionOfTwoSets (point2D[] a_, point2D[] b_)
+	{
+		a = a_;
+		b = b_;
+		N = a.length;
+	}
+	
+	public int CountIntersections ()
+	{
+		sort(a);
+		sort(b);
+		
+		int number = 0, i = 0, j = 0;
+		
+		while (i < N && j < N)
+		{
+			if (less(a[i], b[j])) i++;
+			else if (less(b[j], a[i])) j++; 
+			else
+			{
+				number++;
+				i++;
+			}
+		}
+
+		return number;
+	}
+		
+	private static void sort(point2D[] a)
+    {
+	    int N = a.length;
+		int h = 1;
+		while (h < N/3) h = 3*h + 1; // 1, 4, 13, 40, 121, 364, ...
+		while (h >= 1)
+		{ 
+		    // h-sort the array.
+			for (int i = h; i < N; i++)
+				for (int j = i; j >= h && less(a[j], a[j-h]); j -= h)
+					 exch(a, j, j-h);
+			 h = h/3;
+		}
+	}
+	
+	private static boolean equal(point2D a, point2D b)
+	{
+		return ((a.x == b.x) && (a.y == b.y)) ? true : false;
+	}
+	
+	private static boolean less(point2D v, point2D w)
+	 {
+		if (v.x < w.x) return true;
+		if (v.x > w.x) return false;
+		if (v.y < w.y) return true;
+		else return false;
+	 }
+	
+	 private static void exch(point2D[] a, int i, int j)
+	 { 
+		 point2D swap = a[i];
+		 a[i] = a[j];
+		 a[j] = swap;
+	 }
+	
+	public static class point2D
+	{
+		public int x;
+		public int y;
+		public point2D (int x_, int y_)
+		{
+			x = x_;
+			y = y_;
+		}
+	}
+	
+	public static void main(String[] args)
+	{
+		point2D[] a = new point2D[7];
+		point2D[] b = new point2D[7];
+		a[0] = new point2D(-246, -444);
+		a[1] = new point2D(274, 1);
+		a[2] = new point2D(2, 1);
+		a[3] = new point2D(24, 2);
+		a[4] = new point2D(2, 4);
+		a[5] = new point2D(86, 0);
+		a[6] = new point2D(0, 14);
+		
+		b[0] = new point2D(0, 1);
+		b[1] = new point2D(4, 1);
+		b[2] = new point2D(7, 13);
+		b[3] = new point2D(2, 4);
+		b[4] = new point2D(3, 3);
+		b[5] = new point2D(564, 0);
+		b[6] = new point2D(-246, -444);
+		
+		IntersectionOfTwoSets task1 = new IntersectionOfTwoSets(a, b);
+		
+		System.out.println("There are " + task1.CountIntersections() + " intersections in the arrays.");
+	}
+}
+
+Output:
+There are 2 intersections in the arrays.
+
+====================================================================================================
+
+public class Permutation 
+{
+    private int[] a;
+	private int[] b;
+	private int N;
+	
+	public Permutation(int[] a_, int[] b_)
+	{
+		a = a_;
+		b = b_;
+		N = a.length;
+	}
+	
+	public boolean arePermutations()
+	{
+		if (a.length != b.length) return false;
+		sort(a);
+		sort(b);
+		for (int i = 0; i < N; i++)
+			if (a[i] != b[i]) return false;
+		return true;
+	}
+	
+	private static void sort(int[] a)
+    {
+	    int N = a.length;
+		int h = 1;
+		while (h < N/3) h = 3*h + 1; // 1, 4, 13, 40, 121, 364, ...
+		while (h >= 1)
+		{ 
+		    // h-sort the array.
+			for (int i = h; i < N; i++)
+				for (int j = i; j >= h && less_x(a[j], a[j-h]); j -= h)
+					 exch(a, j, j-h);
+			h = h/3;
+	    }
+	}
+	
+	private static boolean less_x(int v, int w)
+	{
+	    return v < w; 
+	}
+	
+	private static void exch(int[] a, int i, int j)
+	{ 
+        int swap = a[i];
+	    a[i] = a[j];
+	    a[j] = swap;
+	}
+	
+	public static void main(String[] args)
+    {
+		int[] a = {1, 2, 3, 4, 5};
+		int[] b = {1, 3, 4, 2, 5};
+		Permutation task2 = new Permutation(a, b);
+		System.out.println(task2.arePermutations());
+		
+		int[] c = {1, 2, 3, 6, 5};
+		int[] d = {1, 3, 4, 2, 5};
+		Permutation task2_1 = new Permutation(c, d);
+		System.out.print(task2_1.arePermutations());
+    }
+}
+
+Output: 
+true
+false
+
+====================================================================================================
+
+public class DutchNationalFlag
+{
+	private Bucket[] array;
+	int colour_number = 0;
+	int swap_number = 0;
+	
+	static class Bucket
+	{
+		private String pebble;
+		public Bucket(String s)
+		{
+			pebble = s;
+		}
+	}
+	
+	public void sort()
+	{
+		int lowR = 0, lowL = 0, highR = array.length - 1, highL = array.length - 1;
+		String LowR, HighL;
+		boolean left = true, right = true;
+		
+		LowR = colour(lowR);
+		HighL = colour(highL);
+		if (LowR == "White") left = false;
+		if (HighL == "Blue") right = false;
+		
+		while (true)
+		{
+			if (LowR != "Blue") 
+			{
+				if (LowR == "Red") 
+				{
+					if (!left) left = true;
+				}
+				else
+				{
+					if (left) swap(lowL++, lowR);
+					else lowL++;
+				}
+				if (++lowR < highL) LowR = colour(lowR);
+			}
+			else if (HighL != "White") 
+			{
+				if (HighL == "Red") 
+				{
+					if (!right) right = true;
+				}
+				else
+				{
+					if (right) swap(highR--, highL);
+					else highR--;
+				}
+				if (lowR < --highL) HighL = colour(highL);
+			}
+			else 
+			{
+				swap(lowR, highL);
+				HighL = "Blue";
+				LowR = "White";
+				
+				if (left) 
+				{
+					swap(lowL++, lowR);
+					LowR = "Red";
+				}
+				else lowL++;
+				if (right)
+				{
+					swap(highR--, highL);
+					HighL = "Red";
+				}
+				else highR--;
+					
+				if (++lowR < highL) LowR = colour(lowR);
+			}
+				
+			if (lowR == highL) break;			
+		}
+	}
+	
+	private void swap(int i, int j)
+	{
+		Bucket buffer = array[i];
+		array[i] = array[j];
+		array[j] = buffer;
+		swap_number++;
+	}
+	
+	private String colour(int i)
+	{
+		colour_number++;
+		return array[i].pebble;
+	}
+	
+	public DutchNationalFlag(Bucket[] input)
+	{
+		array = input;
+	}
+	
+	public static void main(String[] args)
+	{
+		Bucket[] array = new Bucket[20];
+		array[0] = new Bucket("Red");
+		array[1] = new Bucket("Blue");
+		array[2] = new Bucket("White");
+		array[3] = new Bucket("Red");
+		array[4] = new Bucket("Red");
+		array[5] = new Bucket("White");
+		array[6] = new Bucket("White");
+		array[7] = new Bucket("Red");
+		array[8] = new Bucket("Blue");
+		array[9] = new Bucket("White");
+		array[10] = new Bucket("Blue");
+		array[11] = new Bucket("Blue");
+		array[12] = new Bucket("White");
+		array[13] = new Bucket("Blue");
+		array[15] = new Bucket("White");
+		array[16] = new Bucket("White");
+		array[17] = new Bucket("Red");
+		array[18] = new Bucket("Blue");
+		array[19] = new Bucket("White");
+		
+		DutchNationalFlag task3 = new DutchNationalFlag(array);
+		task3.sort();
+		
+		for (int i = 0; i < 20; i++)
+			System.out.println(i + 1  + ") " + array[i].pebble);
+	}
+} 
+
+
+Output:
+1) White
+2) White
+3) White
+4) White
+5) White
+6) White
+7) White
+8) White
+9) Red
+10) Red
+11) Red
+12) Red
+13) Red
+14) Red
+15) Blue
+16) Blue
+17) Blue
+18) Blue
+19) Blue
+20) Blue

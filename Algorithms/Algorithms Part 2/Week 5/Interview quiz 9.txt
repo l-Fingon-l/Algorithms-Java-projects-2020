@@ -1,0 +1,6 @@
+1) Make a MinPQ and add all the letters with their frequencies to create a Node forest.
+2) Repeat the next steps until there are more than 2 Nodes left in the PQ:
+    ~ delete 3 minimum Nodes;
+    ~ add a new Node with a frequency that is a sum of the 3 Nodes we just got to the PQ;
+3) We get the Huffman code the moment we terminate. The proof is the same as for binary alphabet.
+=======================================================================================================================

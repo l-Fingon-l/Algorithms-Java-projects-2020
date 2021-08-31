@@ -1,0 +1,12 @@
+If we have a system of binary equations to solve, we could build a circuit-graph for it using the colours of the 
+colourability (that will be implied after). To keep the variables just 1s and 0s we can remove the 3rd colour by 
+connecting a "third" vertex to any other vertex. Thus, the SAT reduces to 3COLOR what means that 3COLOR is NP-complete.
+=========================================================================================================================
+If I had to prove it then it would've meant SAT is a P-complexity problem whilst it is an NP-complete one. And that 
+would've meant P = NP. I'm sorry, I can't prove that yet.
+=========================================================================================================================
+Step 1: sum up all the edge weights and let it be X;
+Step 2: run the search version to find a tour;
+Step 3: decrement X and run the search version while X is more than 0 or while it is still possible to find a tour.
+Step 4: return the tour.
+The optimization version solved in at most X calls to the search version.

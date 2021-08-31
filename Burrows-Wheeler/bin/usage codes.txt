@@ -1,0 +1,2 @@
+java BurrowsWheeler - < aesop.txt | java MoveToFront - | java -cp algs4.jar edu.princeton.cs.algs4.Huffman - > aesop.bzip2
+java -cp algs4.jar edu.princeton.cs.algs4.Huffman + < aesop.bzip2 | java MoveToFront + | java BurrowsWheeler + > source.txt

@@ -1,0 +1,10 @@
+I don't know how to reduce it in linear time. The best solution I know is to add an edge s-t 
+(if it is not present yet) and then until a cycle which contains both S and T is found:
+1) compute the longest cycle;
+2) If it does not contain both S and T, delete all edges from the cycle;
+But it might have E-1 calls to LongestCycle...
+===================================================================================================================
+Add an integer zero to an array a. Then run 4Sum. If there existed a 3Sum then with this 0 it would give a 4Sum.
+===================================================================================================================
+Double the array with ai*(-8) element for every entry ai. Run the 3Sum and if it finds the 3Sum then you have 
+a 3Linear in the array given.

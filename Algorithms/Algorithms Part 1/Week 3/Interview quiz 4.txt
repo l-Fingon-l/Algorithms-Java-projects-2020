@@ -1,0 +1,265 @@
+You can copy the 1-st array to the auxiliary array. Then when you make comparisons and find the less you write it directly to the original array (it's 1st part). There should be enough space to guarantee that no overrides will be done, damaging the 2nd array, since even in the worst case (nothing was written from the 2nd array and it's untouched till the moment the 1st array exceeds) the whole 1st array will fit in the gap (literally it was the space that held this array before).
+
+==============================================================================================================
+
+
+public class CountInversions
+{
+	private static int amount = 0;
+	
+	private static void merge(Comparable[] a, Comparable[] aux, int lo, int mid, int hi)
+	{
+		 for (int k = 0; k <= mid - lo; k++)
+			 aux[k] = a[k + lo];
+		 int i = 0, j = mid+1;
+		 for (int k = lo; k <= hi; k++)
+		 {
+			 if (i > mid - lo) a[k] = a[j++];
+			 else if (j > hi) a[k] = aux[i++];
+			 else if (less(a[j], aux[i])) 
+			 {
+				 amount += j - k;
+				 a[k] = a[j++];
+			 }
+			 else a[k] = aux[i++];
+		 }
+	}
+
+    private static void sort(Comparable[] a, Comparable[] aux, int lo, int hi)
+	{
+	    if (hi <= lo) return;
+	    int mid = lo + (hi - lo) / 2;
+	    sort(a, aux, lo, mid);
+	    sort(a, aux, mid+1, hi);
+	    merge(a, aux, lo, mid, hi);
+	}
+    
+    private static boolean less(Comparable v, Comparable w)
+    { 
+    	return v.compareTo(w) < 0; 
+    }
+    
+    private static boolean equal(Comparable v, Comparable w)
+    {
+    	return v.compareTo(w) == 0;
+    }
+
+	public static void sort(Comparable[] a)
+	{
+	    Comparable[] aux = new Comparable[a.length / 2 + 1];
+	    sort(a, aux, 0, a.length - 1);
+	}
+	
+	public int Count(Comparable[] a)
+	{
+		int N = a.length, low = 0, middle = 0, high = N - 1;
+		sort(a);
+		
+		return amount;
+	}
+	
+	public static void main(String[] args)
+	{
+		CountInversions task2 = new CountInversions();
+		Comparable[] a = new Comparable[6];
+		a[0] = 60;
+		a[1] = 4;
+		a[2] = 2;
+		a[3] = 5;
+		a[4] = 10; 
+		a[5] = 9;
+		
+		System.out.println("There are " + task2.Count(a) + " inversions in the array.");
+	}
+}
+
+Output:
+There are 7 inversions in the array.
+
+==============================================================================================================
+
+import edu.princeton.cs.algs4.StdRandom;
+
+public class ShufflingALinkedList
+{
+	 private List.Node b;
+	 private List.Node c;
+	 private List.Node beg;
+	
+	public static class List
+	{
+		public Node first;
+		public Node current;
+		public int N;
+		
+		public class Node
+		{
+			public Node next;
+			public String item;
+		}
+		
+		public List()
+		{
+			first = null;
+			N = 0;
+		}
+		
+		public void push(String s)
+		{
+			Node old = first;
+			first = new Node();
+			first.item = s;
+			first.next = old;
+			N++;
+		}
+	}
+	
+	private List.Node merge(List.Node a, List.Node b, int a_size, int b_size, List.Node next)
+	{
+		int N = a_size + b_size;
+		boolean empty = true;
+		
+		List merged = new List();
+		int a_N = 0, b_N = 0;
+		for (int i = 0; i < N; i++)
+		{
+			if (empty)
+			{
+				if (StdRandom.uniform(2) == 0) 
+				{
+					merged.first = a;
+					a = a.next;
+					a_N++;
+				}
+				else 
+				{
+					merged.first = b;
+					b = b.next;
+					b_N++;
+				}
+				empty = false;
+				merged.current = merged.first;
+			}
+			else if (a_N >= a_size)
+			{
+				merged.current.next = b;
+				merged.current = merged.current.next;
+				b = b.next;
+				b_N++;
+			}
+			else if (b_N >= b_size)
+			{
+				merged.current.next = a;
+				merged.current = merged.current.next;
+				a = a.next;
+				a_N++;
+			}
+			else	
+			{
+				if (StdRandom.uniform(2) == 0) 
+				{
+					merged.current.next = a;
+					merged.current = merged.current.next;
+					a = a.next;
+					a_N++;
+				}
+				else
+				{
+					merged.current.next = b;
+					merged.current = merged.current.next;
+					b = b.next;
+					b_N++;
+				}
+			}
+		}
+		
+		a = null;
+		b = null;
+		merged.current.next = next; 
+		
+		List.Node result = merged.first;
+		merged = null;
+		
+		return result;
+	}
+	
+	private void shuffle(List a, int lo, int hi)
+	{
+	    if (hi <= lo) return;
+	    
+	    int mid = lo + (hi - lo) / 2;
+	    
+	    shuffle(a, lo, mid);
+	    shuffle(a, mid+1, hi);
+	    
+	    beg = a.first;
+	    c = a.first;
+	    List.Node end;
+	    for (int i = 0; i < lo; i++)
+	    {
+	    	if (i != 0) beg = beg.next;
+	    	c = c.next;
+	    }
+	    	
+	    b = c;
+	    for (int i = lo; i < mid + 1; i++)
+	    	b = b.next;
+	    end = b;
+	    for (int i = 0; i < hi - mid; i++)
+	    {
+	    	end = end.next;
+	    }
+	    
+	    if (lo == 0) a.first = merge(c, b, mid + 1 - lo, hi - mid, end);
+	    else beg.next = merge(c, b, mid + 1 - lo, hi - mid, end);
+	}
+	
+	public List shuffle(List a)
+	{
+		beg = a.first;
+		shuffle(a, 0, a.N - 1);
+		return a;
+	}
+	
+	public static void main(String[] args)
+	{
+		List a = new List();
+		a.push("A");
+		a.push("B");
+		a.push("c");
+     	a.push("D");
+ 	    a.push("e");
+		a.push("F");
+		a.push("G");
+		a.push("h");
+		a.push("i");
+		a.push("J");
+		a.push("k");
+		a.push("L");
+		a.push("m");
+		
+		ShufflingALinkedList task3 = new ShufflingALinkedList();
+		a = task3.shuffle(a);
+		a.current = a.first;
+		for (int i = 0; i < 13; i++)
+		{
+			System.out.println(a.current.item);
+			a.current = a.current.next;
+		}
+	}
+}
+
+Output:
+m
+h
+J
+F
+A
+k
+L
+e
+c
+B
+G
+i
+D

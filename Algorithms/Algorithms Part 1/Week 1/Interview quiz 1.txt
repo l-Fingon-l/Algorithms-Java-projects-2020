@@ -1,0 +1,307 @@
+import java.util.Arrays;
+
+public class AnalysisOfAlgorithms 
+{
+	private int[] array;
+	
+	private void Sort()
+	{
+		Arrays.sort(array);
+	}
+	
+	public AnalysisOfAlgorithms(int[] input)
+	{
+		array = input;
+		Sort();
+	}
+	
+	public int Sum3QuadraticTime()
+	{
+		int amount = 0, high = 0;
+		int base_id = 0, low_id = 1, high_id = array.length - 1, highBorder_id = high_id;
+		boolean side = false;
+		for (int base = array[base_id], low = array[low_id]; base + low < 0; base = array[++base_id],
+				low_id = base_id + 1, low = array[low_id]) // no more than (N - 1)/2 cycles
+		{
+			// base - 1st element
+			// low - 2nd element
+			
+			// looking for the high border
+			while (-(base + low) < array[highBorder_id]) 
+			{
+				if (highBorder_id == low_id) return amount; //safety check
+				highBorder_id--;
+			}
+			side = true; // true - right, false - left
+			high_id = highBorder_id;
+			high = array[high_id]; // 3rd element
+			
+			while (low != high) // no more than (N - base_id - 3) cycles
+			{
+				if (side)
+				{
+					do
+					{
+						if (low == high) break; //safety check
+						if (-(base + low) == high) amount++;
+						high = array[--high_id];
+					}
+					while (-(base + low) <= high);
+					
+					side = false;
+				}
+				else
+				{
+					do 
+					{
+						if (low == high) break; //safety check
+						if (-(base + low) == high) amount++;
+						low = array[++low_id];
+					}
+					while (-(base + low) > high);
+					
+					side = true;
+				}
+			}
+		}
+		
+		return amount;
+	}
+	
+	
+	
+	public static void main(String[] args)
+	{
+		int amount = Integer.parseInt(args[0]);
+		int[] array = new int[amount];
+		for (int i = 0; i < amount; i++) array[i] = Integer.parseInt(args[i + 1]);
+		
+		AnalysisOfAlgorithms task1 = new AnalysisOfAlgorithms(array);
+		System.out.println("There are " + task1.Sum3QuadraticTime() + " triples that sum to zero.");
+	}
+
+}
+
+And an example of an input data:
+5 -2 -1 0 1 3
+Result: 
+There are 2 triples that sum to zero.
+
+
+
+=========================================================================================================
+
+import java.util.Random;
+
+public class AnalysisOfAlgorithms
+{
+	private int[] array;
+	private int a; // iterator
+	private int b; // iterator
+	private int middle; // iterator
+	private int MaxArrayLength;
+	private int step;
+	
+	boolean is_present;
+	
+	private int check; // value
+	
+	private int searched; // value
+	private boolean side; // false = left, true = right
+	
+	private boolean binarySearch()
+	{
+		if (a == middle) 
+		{
+			if (array[a] == searched) return true;
+			if (array[b] == searched) return true;
+			return false;
+		}
+		
+		if (side ^ (array[middle] > searched))
+		{
+			b = middle - 1;
+			middle = (a + b) / 2;
+			return binarySearch();
+		}
+		else if (side ^ (array[middle] < searched))
+		{
+			a = middle + 1;
+			middle = (a + b) / 2;
+			return binarySearch();
+		} 
+		else return true;
+	}
+	
+	// finding bitonic point  
+    private boolean findBitonicPoint(int l, int r) 
+    { 
+    	if (array[middle] == searched) return true;
+    	if (array[middle] < searched)
+		{
+            middle = (r + l) / 2; 
+            if (array[middle] > array[middle - 1] && array[middle] > array[middle + 1]) 
+            { 
+                if(array[middle] == searched) return true;
+                else return false;
+            }
+            else 
+            { 
+                if (array[middle] > array[middle - 1] && array[middle] < array[middle + 1]) 
+                { 
+                    findBitonicPoint(middle, r); 
+                } 
+                else 
+                { 
+                    if (array[middle] < array[middle - 1] && array[middle] > array[middle + 1]) 
+                    { 
+                        findBitonicPoint(l, middle); 
+                    } 
+                } 
+            } 
+            return false; 
+		}
+    	else 
+		{
+			int a_ = a, b_ = b, middle_ = middle;
+			if (!binarySearch())
+			{
+				side = !side;
+				a = a_;
+				b = b_;
+				middle = middle_;
+				return binarySearch();
+			}
+			else return true;
+		}
+    } 
+	
+	public AnalysisOfAlgorithms(int x, int length, int step_) // with input generation
+	{
+		step = step_;
+		MaxArrayLength = length;
+		searched = x;
+		side = false; 
+		a = 0;
+		GenerateBitonicArray();
+		b = array.length - 1;
+		middle = (a + b) / 2;
+	}
+	
+	public AnalysisOfAlgorithms(int x, int[] input) // with given array
+	{
+		array = input;
+		searched = x;
+		side = false; 
+		a = 0;
+		b = array.length - 1;
+		middle = (a + b) / 2;
+	}
+	
+	public boolean SearchInABitonicArray(boolean phase)
+	{
+		if (array[middle] == searched) return true;
+		if (array[middle] < searched)
+		{
+			int check_id = (middle + (side ? a : b)) / 2;
+			check = array[check_id];
+			if (array[middle] == check) 
+			{
+				if (array[middle + 1] == searched) return true;
+				else return false;
+			}
+			
+			if (array[middle] < check)
+			{
+				if (!side) a = middle + 1;
+				else b = middle - 1;
+				middle = check_id;
+				phase &= false;
+				return SearchInABitonicArray(phase);
+			}
+			else 
+			{
+				if (phase) return findBitonicPoint(a, b);
+				phase = !phase;
+				side = !side;
+				return SearchInABitonicArray(phase);
+			}
+		}
+		else 
+		{
+			int a_ = a, b_ = b, middle_ = middle;
+			if (!binarySearch())
+			{
+				side = !side;
+				a = a_;
+				b = b_;
+				middle = middle_;
+				return binarySearch();
+			}
+			else return true;
+		}
+	}
+	
+	private void GenerateBitonicArray()
+	{
+		// create instance of Random class 
+        Random rand = new Random(); 
+  
+        // Generate random integers in range 0 to 999 
+        int size = rand.nextInt(MaxArrayLength);
+        array = new int[size];
+        int size1 = rand.nextInt(size);
+        int starting_point = rand.nextInt((MaxArrayLength + 2) * step) - rand.nextInt((MaxArrayLength + 2) * step);
+        for (int i = 0; i < size1; i++) 
+        {
+        	array[i] = rand.nextInt(step) - starting_point + i * step;
+        	if (array[i] == 0) is_present = true;
+        }
+        	
+        starting_point = array[size1 - 1] - 1;
+        for (int i = size1; i < size; i++) 
+        {
+        	array[i] = rand.nextInt(step) + starting_point - i * step;
+        	if (array[i] == 0) is_present = true;
+        }
+        
+/*        System.out.print(size);
+        char c = ' ', c1 = ',';
+        for (int i = 0; i < size; i++)
+        {
+        	System.out.append(c);
+        	System.out.append(c1);
+        	System.out.print(array[i]);
+        }*/
+	}
+
+	
+	public static void main(String[] args)
+	{
+		int searched = 12452;
+		
+		AnalysisOfAlgorithms task2 = new AnalysisOfAlgorithms(searched, 10000000, 100);
+		System.out.println("The number " + searched + (task2.SearchInABitonicArray(false) ? " is present in the array."
+		: " is not present in the array."));
+	}
+}
+
+
+And an example of an input data:
+int searched = -25;
+int[] array = {-100, -25, -24, -18, -16, -13, -12, -7, -6, -5, -2, 0, 150, 
+200, 230, 231, 230, 200, 13, -20000};
+
+The result:
+The number -25 is present in the array.
+
+
+
+=========================================================================================================
+
+
+Version 0: int T = 1; while (!does_break(T)) {T++;} just loop from floor 1 to T;
+Version 1: binary search;
+Version 2: int T = 1; while (!does_break(T)) {T *= 2;}. Look for the high border => lgT. Then binary search for T elements => lgT;
+Version 3: int T = 1; while (!does_break(T)) {T += sqrt(n);}. Look for the high border => sqrt(n). Then loop from T-1 to the searched value => sqrt(n).
+Version 4:  

@@ -1,0 +1,10 @@
+Since the red-black BST is always legal we can just check the 4 situations and make an insert after knowing exactly the algorithm we need to apply. And the search algorithm does not need to be changed at all as it does not cope with "red" and "black" links at all.
+
+==============================================================================================================
+Firstly, create a Balanced Search Tree and store the words as keys in it. The values should be the sorted lists with the numbers in it, corresponding to the places of appearance of the words in the original text. The creation of the BST should take a n * log(n) time.
+After that, take the i-th position of the 1-st word (of query m ones) and search for the nearest position of the next word (1 till m - 1 words for query ones). As you have found this "short" interval, measure it's length and save. Iterate this from 1 to i positions of the 1-st word (or break when the whole interval was not found). Each time the new interval's length is less then the saved one, update it.
+
+==============================================================================================================
+
+Use a red-black BST with keys corresponding to the number "i" of the item added.
+Maybe some moment should re-write all the keys not to get into integer overflow (of a key).
