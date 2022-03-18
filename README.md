@@ -32,7 +32,7 @@ by 1. Since n is finite, then FF will terminate.
 ```
 
 Undirected graph diameter search
-![graphs](images/graphs.png)
+![graphs](https://user-images.githubusercontent.com/70348701/158785868-5ee032c3-0979-4744-afa4-d764ee6070e5.png)
 
 ---
 All rights for the Java libraries and task ideas belong to their creators and [Princeton University](https://algs4.cs.princeton.edu/home/).
